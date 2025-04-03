@@ -18,6 +18,26 @@ const Chatbot: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   
+  // Load speech synthesis voices when component mounts
+  useEffect(() => {
+    // This is needed because in some browsers, voices aren't loaded immediately
+    const loadVoices = () => {
+      window.speechSynthesis.getVoices();
+      console.log("Speech synthesis voices loaded");
+    };
+    
+    loadVoices();
+    
+    // Some browsers (like Chrome) need an event listener to get the voices
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+    
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null;
+    };
+  }, []);
+  
   // Scroll to bottom whenever messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

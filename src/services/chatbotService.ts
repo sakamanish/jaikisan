@@ -90,19 +90,41 @@ export const speakText = (text: string, language: string): void => {
     window.speechSynthesis.cancel();
   }
 
-  // Clean text before speaking (remove markdown formatting)
+  // Clean text for speech - remove ALL markdown formatting
   const cleanText = text
     .replace(/\*\*/g, '')
     .replace(/\*/g, '')
     .replace(/^#+\s*/gm, '')
-    .replace(/^-\s+/gm, '');
+    .replace(/^-\s+/gm, '')
+    .replace(/\n/g, '. '); // Replace newlines with pauses to improve speech flow
 
+  // Enhanced speech synthesis setup
   const utterance = new SpeechSynthesisUtterance(cleanText);
   utterance.lang = lang;
-  utterance.rate = 0.9; // Slightly slower for clarity
+  utterance.rate = 0.85; // Slightly slower for better clarity with non-Latin scripts
+  utterance.pitch = 1.0;
+  
+  // Get available voices and try to find a match for the language
+  const voices = window.speechSynthesis.getVoices();
+  console.log(`Available voices: ${voices.length}`);
+  
+  // Try to find a matching voice for the selected language
+  const matchingVoice = voices.find(voice => voice.lang.startsWith(lang.split('-')[0]));
+  if (matchingVoice) {
+    console.log(`Using matching voice: ${matchingVoice.name} (${matchingVoice.lang})`);
+    utterance.voice = matchingVoice;
+  } else {
+    console.log(`No matching voice found for ${lang}, using default`);
+  }
   
   // Log speech details for debugging
   console.log(`Speaking in language: ${lang}, text length: ${cleanText.length} chars`);
+  console.log(`Text sample: ${cleanText.substring(0, 50)}...`);
+  
+  // Add event listeners for speech synthesis events to help with debugging
+  utterance.onstart = () => console.log("Speech started");
+  utterance.onend = () => console.log("Speech ended");
+  utterance.onerror = (event) => console.error("Speech error:", event);
   
   window.speechSynthesis.speak(utterance);
 };
