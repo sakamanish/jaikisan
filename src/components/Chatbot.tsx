@@ -10,7 +10,7 @@ import { ChatMessage as ChatMessageType, getChatbotResponse, speakText, initiali
 
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessageType[]>([
-    { role: 'assistant', content: 'Hello! I\'m your farming assistant. Ask me any questions about crops, diseases, or farming techniques. How can I help you today?' }
+    { role: 'assistant', content: "Hello! I'm your farming assistant. Ask me about crops, soil, or farming methods. I'll give you simple, practical advice." }
   ]);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -32,25 +32,38 @@ const Chatbot: React.FC = () => {
     };
   }, []);
 
+  // Speak the welcome message on initial load
+  useEffect(() => {
+    // Small timeout to ensure speech synthesis is ready
+    const timer = setTimeout(() => {
+      speakText(messages[0].content, selectedLanguage);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
     
     // Find the language name
     const languageName = SUPPORTED_LANGUAGES.find(lang => lang.code === language)?.name.split(' ')[0] || 'English';
     
+    // Create welcome message for the new language
+    let welcomeMessage = `I'll now speak in ${languageName}. How can I help with your farming?`;
+    
     // Add a system message indicating the language change
     const newMessages: ChatMessageType[] = [
       ...messages,
       { 
         role: 'assistant', 
-        content: `Language changed to ${languageName}. How can I help you?` 
+        content: welcomeMessage
       }
     ];
     
     setMessages(newMessages);
     
     // Speak the language change confirmation
-    speakText(`Language changed to ${languageName}. How can I help you?`, language);
+    speakText(welcomeMessage, language);
   };
 
   const handleStartRecording = () => {
@@ -82,6 +95,10 @@ const Chatbot: React.FC = () => {
   };
 
   const handleUserMessage = async (content: string) => {
+    if (!content.trim()) {
+      return; // Don't process empty messages
+    }
+    
     // Add user message
     const userMessage: ChatMessageType = { role: 'user', content };
     const newMessages = [...messages, userMessage];
@@ -112,17 +129,20 @@ const Chatbot: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto h-[80vh] flex flex-col shadow-lg border-farm-green/20">
-      <CardHeader className="p-4 border-b bg-gradient-to-r from-farm-beige to-farm-light-green/30">
-        <LanguageSelector 
-          selectedLanguage={selectedLanguage}
-          onLanguageChange={handleLanguageChange}
-          disabled={isProcessing || isRecording}
-        />
+    <Card className="w-full max-w-md mx-auto h-[80vh] flex flex-col shadow-lg border-farm-green/20 rounded-xl">
+      <CardHeader className="p-4 border-b bg-gradient-to-r from-farm-beige to-farm-light-green/30 rounded-t-xl">
+        <div className="flex flex-col space-y-2">
+          <h3 className="text-lg font-medium text-farm-green text-center">Farmer's Voice Assistant</h3>
+          <LanguageSelector 
+            selectedLanguage={selectedLanguage}
+            onLanguageChange={handleLanguageChange}
+            disabled={isProcessing || isRecording}
+          />
+        </div>
       </CardHeader>
       
       <CardContent className="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-white to-farm-beige/10">
-        <div className="space-y-2">
+        <div className="space-y-3">
           {messages.map((message, index) => (
             <ChatMessage key={index} message={message} />
           ))}
@@ -130,7 +150,7 @@ const Chatbot: React.FC = () => {
         </div>
       </CardContent>
       
-      <CardFooter className="p-4 border-t space-y-4 bg-white">
+      <CardFooter className="p-4 border-t space-y-4 bg-white rounded-b-xl">
         <div className="w-full space-y-4">
           <ChatInput 
             onSendMessage={handleUserMessage}

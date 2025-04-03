@@ -12,16 +12,16 @@ const Index = () => {
       
       <main className="flex-1 container mx-auto p-4 flex flex-col items-center">
         <div className="w-full max-w-md mb-6 text-center">
-          <h2 className="text-2xl font-bold text-farm-green mb-2">Farmer's Voice Assistant</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-farm-green mb-2">Farmer's Voice Assistant</h2>
           <p className="text-gray-600">
-            Get simple, practical farming advice in your language
+            Get quick, simple farming advice in your language
           </p>
         </div>
         
         <Chatbot />
       </main>
       
-      <footer className="bg-farm-soil text-white p-4 text-center text-sm">
+      <footer className="bg-farm-soil text-white p-4 text-center text-sm mt-6">
         <p>© 2023 किसान वाणी साथी - Helping farmers through voice technology</p>
       </footer>
     </div>

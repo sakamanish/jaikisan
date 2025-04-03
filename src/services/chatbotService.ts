@@ -35,14 +35,15 @@ export const getChatbotResponse = async (
     // System message to instruct the AI to respond in the selected language
     const systemMessage: ChatMessage = {
       role: "system",
-      content: `You are a helpful agricultural assistant for farmers. 
-      Provide practical advice on farming techniques, crop diseases, weather considerations, and best practices.
-      Your answers must be clear, concise, and in ${language} language. 
-      Keep responses brief with only key actionable points - no hashtags, no lengthy explanations.
-      Format responses in short bullet points with simple language for farmers.
-      Avoid using markdown formatting like headings, bullet points with symbols, or unnecessary formatting.
-      Speak directly to the farmer with practical steps they can take immediately.
-      If you don't know something, admit it clearly rather than providing incorrect information.`
+      content: `You are a helpful agricultural assistant for farmers.
+      Provide SHORT and DIRECT advice on farming techniques, crop diseases, weather considerations, and best practices.
+      IMPORTANT: Your response MUST be in ${language} language - do not mix with English.
+      Keep responses very brief (3-5 short points maximum) with only key actionable points.
+      DO NOT use any markdown formatting, asterisks, hashtags or bullet point symbols - use simple text only.
+      Use plain formatting - no headings, no bullet points with symbols.
+      Speak directly to the farmer with simple practical steps they can take immediately.
+      Use simple words that farmers will understand.
+      If you don't know something, say so briefly.`
     };
 
     // Prepare messages for the API request
@@ -60,7 +61,7 @@ export const getChatbotResponse = async (
         temperature: 0.7,
         top_p: 0.95,
         max_tokens: 800,
-        model: MODEL_NAME  // Add model explicitly in the request body
+        model: MODEL_NAME  // Include model name explicitly
       })
     });
 
@@ -83,15 +84,25 @@ export const getChatbotResponse = async (
 export const speakText = (text: string, language: string): void => {
   // Find the language voice name
   const lang = SUPPORTED_LANGUAGES.find(lang => lang.code === language)?.voiceName || 'en-IN';
-
+  
   // Cancel any ongoing speech
   if (window.speechSynthesis.speaking) {
     window.speechSynthesis.cancel();
   }
 
-  const utterance = new SpeechSynthesisUtterance(text);
+  // Clean text before speaking (remove markdown formatting)
+  const cleanText = text
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/^#+\s*/gm, '')
+    .replace(/^-\s+/gm, '');
+
+  const utterance = new SpeechSynthesisUtterance(cleanText);
   utterance.lang = lang;
   utterance.rate = 0.9; // Slightly slower for clarity
+  
+  // Log speech details for debugging
+  console.log(`Speaking in language: ${lang}, text length: ${cleanText.length} chars`);
   
   window.speechSynthesis.speak(utterance);
 };
