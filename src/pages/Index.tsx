@@ -14,7 +14,7 @@ const Index = () => {
         <div className="w-full max-w-md mb-6 text-center">
           <h2 className="text-2xl font-bold text-farm-green mb-2">Farmer's Voice Assistant</h2>
           <p className="text-gray-600">
-            Ask questions about farming, crops, weather, or any agricultural concerns
+            Get simple, practical farming advice in your language
           </p>
         </div>
         

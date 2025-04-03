@@ -10,9 +10,9 @@ import { ChatMessage as ChatMessageType, getChatbotResponse, speakText, initiali
 
 const Chatbot: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessageType[]>([
-    { role: 'assistant', content: 'नमस्कार! मैं किसान वाणी साथी हूँ। आप कृषि से संबंधित कोई भी प्रश्न पूछ सकते हैं। How can I help you today?' }
+    { role: 'assistant', content: 'Hello! I\'m your farming assistant. Ask me any questions about crops, diseases, or farming techniques. How can I help you today?' }
   ]);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('hi');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,7 +36,7 @@ const Chatbot: React.FC = () => {
     setSelectedLanguage(language);
     
     // Find the language name
-    const languageName = SUPPORTED_LANGUAGES.find(lang => lang.code === language)?.name.split(' ')[0] || 'Hindi';
+    const languageName = SUPPORTED_LANGUAGES.find(lang => lang.code === language)?.name.split(' ')[0] || 'English';
     
     // Add a system message indicating the language change
     const newMessages: ChatMessageType[] = [
@@ -112,8 +112,8 @@ const Chatbot: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto h-[80vh] flex flex-col">
-      <CardHeader className="p-4 border-b">
+    <Card className="w-full max-w-md mx-auto h-[80vh] flex flex-col shadow-lg border-farm-green/20">
+      <CardHeader className="p-4 border-b bg-gradient-to-r from-farm-beige to-farm-light-green/30">
         <LanguageSelector 
           selectedLanguage={selectedLanguage}
           onLanguageChange={handleLanguageChange}
@@ -121,7 +121,7 @@ const Chatbot: React.FC = () => {
         />
       </CardHeader>
       
-      <CardContent className="flex-1 overflow-y-auto p-4">
+      <CardContent className="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-white to-farm-beige/10">
         <div className="space-y-2">
           {messages.map((message, index) => (
             <ChatMessage key={index} message={message} />
@@ -130,7 +130,7 @@ const Chatbot: React.FC = () => {
         </div>
       </CardContent>
       
-      <CardFooter className="p-4 border-t space-y-4">
+      <CardFooter className="p-4 border-t space-y-4 bg-white">
         <div className="w-full space-y-4">
           <ChatInput 
             onSendMessage={handleUserMessage}
