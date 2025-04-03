@@ -56,7 +56,8 @@ export const getChatbotResponse = async (
         messages: apiMessages,
         temperature: 0.7,
         top_p: 0.95,
-        max_tokens: 800
+        max_tokens: 800,
+        model: MODEL_NAME  // Add model explicitly in the request body
       })
     });
 
